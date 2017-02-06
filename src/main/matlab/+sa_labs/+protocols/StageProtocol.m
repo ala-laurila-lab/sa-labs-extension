@@ -6,10 +6,10 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         offsetX = 0         % um
         offsetY = 0         % um
         
-        NDF = 5             % Filter NDF value
+        NDF = 4              % Filter NDF value
         frameRate = 60;     % Hz
         patternRate = 60;   % Hz
-        blueLED = 20        % 0-255
+        blueLED = 200        % 0-255
         greenLED = 0        % 0-255
     end
     
@@ -85,7 +85,7 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
             
             % uses the frame tracker on the monitor to inform the HEKA that
             % the stage presentation has begun. Improves temporal alignment
-            epoch.shouldWaitForTrigger = true;
+            epoch.shouldWaitForTrigger = false;
             
             testMode = obj.rig.getDevice('rigProperty').getConfigurationSetting('testMode');
             if testMode
@@ -132,9 +132,11 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
     
         function rstar = convertRelativeToRStar(obj, inval)
             rstar = [];
-            if isempty(inval)
+            enableRstarConversion = obj.rig.getDevice('rigProperty').getConfigurationSetting('enableRstarConversion');
+            if isempty(inval) || ~ enableRstarConversion
                 return
             end
+            
             if isempty(obj.rig.getDevices('neutralDensityFilterWheel'))
                 filterWheelNdfValues = 1:7;
                 filterWheelAttentuationValues = [1e0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6];
@@ -163,10 +165,9 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         end
     
         function RstarIntensity = get.RstarIntensity(obj)
+            RstarIntensity = [];
             if isprop(obj, 'intensity') && ~ isempty(obj.rig.getDevices('LightCrafter'))
                 RstarIntensity = obj.convertRelativeToRStar(obj.intensity);
-            else
-                RstarIntensity = [];
             end
         end        
         
