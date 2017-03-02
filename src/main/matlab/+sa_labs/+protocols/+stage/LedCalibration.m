@@ -1,29 +1,24 @@
-classdef SpotsMultiSize < sa_labs.protocols.StageProtocol
-    
+classdef LedCalibration < sa_labs.protocols.StageProtocol
+
     properties
+        %times in ms
         preTime = 500	% Spot leading duration (ms)
         stimTime = 1000	% Spot duration (ms)
-        tailTime = 1000	% Spot trailing duration (ms)
+        tailTime = 500	% Spot trailing duration (ms)
         
-        %mean (bg) and amplitude of pulse
-        intensity = 0.5;
+        intensity = 1;
         
-        %stim size in microns, use rigConfig to set microns per pixel
-        minSize = 5
-        maxSize = 500
-
-        numberOfSizeSteps = 12
-        numberOfCycles = 2;
-        
-        logScaling = true % scale spot size logarithmically (more precision in smaller sizes)
+        spotSize = 500; % um
+        numberOfCycles = 3;
     end
     
     properties (Hidden)
-        curSize
-        sizes
+        version = 4
         
         responsePlotMode = 'cartesian';
-        responsePlotSplitParameter = 'curSpotSize';
+        responsePlotSplitParameter = '';
+        blueLEDs
+        curBlueLED
     end
     
     properties (Hidden, Dependent)
@@ -31,48 +26,55 @@ classdef SpotsMultiSize < sa_labs.protocols.StageProtocol
     end
     
     methods
+      
+        
+        %unlike in a "simple" protocol, here I need to add sth to the prepare run and prepare epoch functions
+        %which are executed by the parents, because I want to change a
+        %parameter with every epoch
+        %the stage protocol sets the LED value of the LightCrafter before
+        %each run (=group of epochs), so if we wanted to change its
+        %value for the entire run, we would have to add a prepareRun
+        %function here, but we want to change it in an epoch dependent way,
+        %so we need to add an extension to the prepareEpoch function
+        % obj.numEpochsPrepared is the current epoch count
         
         function prepareRun(obj)
             prepareRun@sa_labs.protocols.StageProtocol(obj);
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice('Optometer'));
-            %set spot size vector
-            if ~obj.logScaling
-                obj.sizes = linspace(obj.minSize, obj.maxSize, obj.numberOfSizeSteps);
-            else
-                obj.sizes = logspace(log10(obj.minSize), log10(obj.maxSize), obj.numberOfSizeSteps);
-            end
+            %set LED current vector
+           obj.blueLEDs=[0:1:15 20:10:100 120:20:240 255];
+           % obj.blueLEDs=[0 5 15 255];
 
         end
         
         function prepareEpoch(obj, epoch)
 
-            % Randomize sizes if this is a new set
-            index = mod(obj.numEpochsPrepared - 1, obj.numberOfSizeSteps);
-            if index == 0
-                obj.sizes = obj.sizes(randperm(obj.numberOfSizeSteps)); 
-            end
+            index = mod(obj.numEpochsPrepared, length(obj.blueLEDs)) + 1;
             
-            % compute current size and add parameter for it
+            % compute current LED current 
             
-            %get current position
-            obj.curSize = obj.sizes(index+1);
-            epoch.addParameter('curSpotSize', obj.curSize);
-            optometer = obj.rig.getDevice('Optometer');
-            epoch.addResponse(optometer);
+            obj.curBlueLED = obj.blueLEDs(index);
+            lightCrafter = obj.rig.getDevice('LightCrafter');
+            lightCrafter.setLedCurrents(0, obj.greenLED, obj.curBlueLED);
+            pause(0.2); % let the projector get set up
+            
             % Call the base method.
             prepareEpoch@sa_labs.protocols.StageProtocol(obj, epoch);
-                        
+            optometer = obj.rig.getDevice('Optometer');
+            epoch.addResponse(optometer);
+            epoch.addParameter('curBlueLED', obj.curBlueLED);
         end
         
         
         function p = createPresentation(obj)
-            %set bg
+            
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
 
+            %set bg
             p.setBackgroundColor(obj.meanLevel);
             
             spot = stage.builtin.stimuli.Ellipse();
-            spot.radiusX = round(obj.um2pix(obj.curSize / 2));
+            spot.radiusX = round(obj.um2pix(obj.spotSize / 2));
             spot.radiusY = spot.radiusX;
             %spot.color = obj.intensity;
             canvasSize = obj.rig.getDevice('Stage').getCanvasSize();
@@ -89,16 +91,15 @@ classdef SpotsMultiSize < sa_labs.protocols.StageProtocol
             
             controller = stage.builtin.controllers.PropertyController(spot, 'color', @(s)onDuringStim(s, obj.preTime, obj.stimTime, obj.intensity, obj.meanLevel));
             p.addController(controller);
-                        
-%             obj.addFrameTracker(p);
+
         end
+        
         
         
         function totalNumEpochs = get.totalNumEpochs(obj)
-            totalNumEpochs = obj.numberOfCycles * obj.numberOfSizeSteps;
+            totalNumEpochs = obj.numberOfCycles * length(obj.blueLEDs);
         end
-        
-        
+
     end
     
 end

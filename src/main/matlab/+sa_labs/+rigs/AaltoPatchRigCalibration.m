@@ -1,8 +1,8 @@
-classdef AaltoPatchRig < symphonyui.core.descriptions.RigDescription
+classdef AaltoPatchRigCalibration < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = AaltoPatchRig()
+        function obj = AaltoPatchRigCalibration()
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;
@@ -28,6 +28,9 @@ classdef AaltoPatchRig < symphonyui.core.descriptions.RigDescription
             
             amp4 = MultiClampDevice('Amp4', 2, 836392).bindStream(daq.getStream('ao3')).bindStream(daq.getStream('ai3'));
             obj.addDevice(amp4);
+            
+            optometer = UnitConvertingDevice('Optometer', 'V').bindStream(daq.getStream('ai4'));
+            obj.addDevice(optometer); 
             
             trigger = UnitConvertingDevice('Oscilloscope Trigger', Measurement.UNITLESS).bindStream(daq.getStream('doport1'));
             daq.getStream('doport1').setBitPosition(trigger, 0);

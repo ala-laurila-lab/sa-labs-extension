@@ -26,6 +26,7 @@ classdef LightStep < sa_labs.protocols.StageProtocol
     methods
       
         function p = createPresentation(obj)
+            
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
 
             %set bg
