@@ -29,8 +29,8 @@ classdef AaltoPatchRig < symphonyui.core.descriptions.RigDescription
             amp4 = MultiClampDevice('Amp4', 2, 836392).bindStream(daq.getStream('ao3')).bindStream(daq.getStream('ai3'));
             obj.addDevice(amp4);
             
-            trigger = UnitConvertingDevice('Oscilloscope Trigger', Measurement.UNITLESS).bindStream(daq.getStream('doport1'));
-            daq.getStream('doport1').setBitPosition(trigger, 0);
+            trigger = UnitConvertingDevice('Oscilloscope Trigger', Measurement.UNITLESS).bindStream(daq.getStream('doport0'));
+            daq.getStream('doport0').setBitPosition(trigger, 0);
             obj.addDevice(trigger);
               
             lightCrafter = sa_labs.devices.LightCrafterDevice('micronsPerPixel',  0.6);
