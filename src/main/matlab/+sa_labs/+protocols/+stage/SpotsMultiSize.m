@@ -34,7 +34,7 @@ classdef SpotsMultiSize < sa_labs.protocols.StageProtocol
         
         function prepareRun(obj)
             prepareRun@sa_labs.protocols.StageProtocol(obj);
-            obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice('Optometer'));
+            % obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice('Optometer'));
             %set spot size vector
             if ~obj.logScaling
                 obj.sizes = linspace(obj.minSize, obj.maxSize, obj.numberOfSizeSteps);
@@ -57,8 +57,8 @@ classdef SpotsMultiSize < sa_labs.protocols.StageProtocol
             %get current position
             obj.curSize = obj.sizes(index+1);
             epoch.addParameter('curSpotSize', obj.curSize);
-            optometer = obj.rig.getDevice('Optometer');
-            epoch.addResponse(optometer);
+            % optometer = obj.rig.getDevice('Optometer');
+            % epoch.addResponse(optometer);
             % Call the base method.
             prepareEpoch@sa_labs.protocols.StageProtocol(obj, epoch);
                         

@@ -85,7 +85,7 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
             
             % uses the frame tracker on the monitor to inform the HEKA that
             % the stage presentation has begun. Improves temporal alignment
-            epoch.shouldWaitForTrigger = false;
+            epoch.shouldWaitForTrigger = true;
             
             testMode = obj.rig.getDevice('rigProperty').getConfigurationSetting('testMode');
             if testMode
