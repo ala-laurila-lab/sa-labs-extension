@@ -42,6 +42,22 @@ classdef AaltoPatchRig < symphonyui.core.descriptions.RigDescription
             ndfWheel.setConfigurationSetting('filterWheelNdfValues', filterWheelNdfValues);
             ndfWheel.addResource('filterWheelAttentuationValues', filterWheelAttentuationValues);
             obj.addDevice(ndfWheel);
+            
+            rigSwitch1 = UnitConvertingDevice('rigSwitch1', Measurement.UNITLESS).bindStream(daq.getStream('diport1'));
+            daq.getStream('diport1').setBitPosition(rigSwitch1, 0);
+            obj.addDevice(rigSwitch1);
+                        
+            rigSwitch2 = UnitConvertingDevice('rigSwitch2', Measurement.UNITLESS).bindStream(daq.getStream('diport1'));
+            daq.getStream('diport1').setBitPosition(rigSwitch2, 1);
+            obj.addDevice(rigSwitch2);
+            
+            rigSwitch3 = UnitConvertingDevice('rigSwitch3', Measurement.UNITLESS).bindStream(daq.getStream('diport1'));
+            daq.getStream('diport1').setBitPosition(rigSwitch3, 2);
+            obj.addDevice(rigSwitch3);
+                        
+            rigSwitch4 = UnitConvertingDevice('rigSwitch4', Measurement.UNITLESS).bindStream(daq.getStream('diport1'));
+            daq.getStream('diport1').setBitPosition(rigSwitch4, 3);
+            obj.addDevice(rigSwitch4);
         end
         
     end

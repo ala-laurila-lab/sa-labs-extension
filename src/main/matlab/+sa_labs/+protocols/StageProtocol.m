@@ -98,6 +98,11 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
                 epoch.addDirectCurrentStimulus(device, device.background, duration, obj.sampleRate);
             end
             
+            deviceNames = obj.rig.getDeviceNames('rigSwitch');
+            for i = 1 : numel(deviceNames)    
+                device = obj.rig.getDevice(deviceNames{i});
+                epoch.addResponse(device);
+            end
         end
             
         function tf = shouldContinuePreloadingEpochs(obj) %#ok<MANU>
@@ -114,6 +119,12 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
                 epoch.removeStimulus(obj.rig.getDevice(obj.chan1));
             end
             
+            deviceNames = obj.rig.getDeviceNames('rigSwitch');
+            for i = 1 : numel(deviceNames)    
+                device = obj.rig.getDevice(deviceNames{i});
+                quantities = epoch.getResponse(device).getData();
+                %disp([deviceNames{i} num2str(quantities(end))]);
+            end            
             completeEpoch@sa_labs.protocols.BaseProtocol(obj, epoch);
         end
         
