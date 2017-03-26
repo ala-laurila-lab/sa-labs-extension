@@ -22,7 +22,8 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         color = 'blue';
         bitDepth = 8;
         numPatternsPerFrame = 1
-        
+        offsetXCorrection = -45
+        offsetYCorrection = -10
         colorType = symphonyui.core.PropertyType('char', 'row', {'cyan','blue','green'});
     end
        
@@ -74,7 +75,9 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
                 lightCrafter = obj.rig.getDevice('LightCrafter');
                 lightCrafter.setPatternAttributes(obj.bitDepth, obj.color, obj.numPatternsPerFrame);
                 lightCrafter.setLedCurrents(0, obj.greenLED, obj.blueLED);
-                lightCrafter.setConfigurationSetting('canvasTranslation', [obj.um2pix(obj.offsetX), obj.um2pix(obj.offsetY)]);
+                offsetXValue = obj.offsetXCorrection + obj.offsetX;
+                offsetYValue = obj.offsetYCorrection + obj.offsetY;
+                lightCrafter.setConfigurationSetting('canvasTranslation', [obj.um2pix(offsetXValue), obj.um2pix(offsetYValue)]);
                 pause(0.2); % let the projector get set up
             end
             prepareRun@sa_labs.protocols.BaseProtocol(obj);
@@ -114,6 +117,7 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         end
 
         function completeEpoch(obj, epoch)
+            
             testMode = obj.rig.getDevice('rigProperty').getConfigurationSetting('testMode');            
             if ~testMode
                 epoch.removeStimulus(obj.rig.getDevice(obj.chan1));
@@ -126,6 +130,7 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
                 %disp([deviceNames{i} num2str(quantities(end))]);
             end            
             completeEpoch@sa_labs.protocols.BaseProtocol(obj, epoch);
+            
         end
         
         function completeRun(obj)

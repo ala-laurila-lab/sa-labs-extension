@@ -4,7 +4,7 @@ classdef ResponseAnalysisFigure1 < sa_labs.figures.ResponseAnalysisFigure
     methods
         
         function obj = ResponseAnalysisFigure1(devices, varargin)
-            obj = obj@sa_labs.figures.ResponseAnalysisFigure(devices, varargin);
+            obj = obj@sa_labs.figures.ResponseAnalysisFigure(devices, varargin{:});
         end
         
         function createUi(obj)

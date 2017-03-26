@@ -6,15 +6,15 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
         chan1Mode = 'Cell attached'
         chan1Hold = 0
         
-        chan2 = 'None';
+        chan2 = 'Amp2';
         chan2Mode = 'Off'
         chan2Hold = 0
         
-        chan3  = 'None';
+        chan3  = 'Amp3';
         chan3Mode = 'Off'
         chan3Hold = 0
         
-        chan4  = 'None';
+        chan4  = 'Amp4';
         chan4Mode = 'Off'
         chan4Hold = 0
         
@@ -105,7 +105,7 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
                     device.background = symphonyui.core.Measurement(newBackground, device.background.displayUnits);
                     device.applyBackground();
                     
-                    if prevBackground ~= newBackground
+                    if prevBackground.quantity ~= newBackground
                         pause(5);
                     end
                 end
@@ -125,7 +125,7 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
             for i = 1 : numel(devices)
                 if obj.responsePlotMode ~= false
                     class = strcat('sa_labs.figures.ResponseAnalysisFigure', num2str(i));
-                    chanModeStr = strcat('chan', num2str(ci), 'Mode');
+                    chanModeStr = strcat('chan', num2str(i), 'Mode');
                     obj.responseFigure = obj.showFigure(class, devices(i), ...
                         'activeFunctionNames', {'mean'}, ...
                         'totalNumEpochs',obj.totalNumEpochs,...
