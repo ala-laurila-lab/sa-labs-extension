@@ -20,14 +20,6 @@ classdef AaltoPatchRigCalibration < symphonyui.core.descriptions.RigDescription
             amp1 = MultiClampDevice('Amp1', 1, 836019).bindStream(daq.getStream('ao0')).bindStream(daq.getStream('ai0'));
             obj.addDevice(amp1);
             
-            amp2 = MultiClampDevice('Amp2', 2, 836019).bindStream(daq.getStream('ao1')).bindStream(daq.getStream('ai1'));
-            obj.addDevice(amp2);
-            
-            amp3 = MultiClampDevice('Amp3', 2, 836392).bindStream(daq.getStream('ao2')).bindStream(daq.getStream('ai2'));
-            obj.addDevice(amp3);
-            
-            amp4 = MultiClampDevice('Amp4', 2, 836392).bindStream(daq.getStream('ao3')).bindStream(daq.getStream('ai3'));
-            obj.addDevice(amp4);
             
             optometer = UnitConvertingDevice('Optometer', 'V').bindStream(daq.getStream('ai4'));
             obj.addDevice(optometer); 
@@ -36,7 +28,7 @@ classdef AaltoPatchRigCalibration < symphonyui.core.descriptions.RigDescription
             daq.getStream('doport1').setBitPosition(trigger, 0);
             obj.addDevice(trigger);
               
-            lightCrafter = sa_labs.devices.LightCrafterDevice('micronsPerPixel',  0.6);
+            lightCrafter = sa_labs.devices.LightCrafterDevice('micronsPerPixel',  1.869);
             lightCrafter.setConfigurationSetting('frameTrackerPosition', [40, 40]);
             lightCrafter.setConfigurationSetting('frameTrackerSize', [80, 80])
             obj.addDevice(lightCrafter);

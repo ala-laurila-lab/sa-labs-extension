@@ -43,6 +43,7 @@ classdef LedCalibration < sa_labs.protocols.StageProtocol
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice('Optometer'));
             %set LED current vector
            obj.blueLEDs=[0:1:15 20:10:100 120:20:240 255];
+
            % obj.blueLEDs=[0 5 15 255];
 
         end

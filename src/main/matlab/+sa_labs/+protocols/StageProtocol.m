@@ -6,10 +6,10 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         offsetX = 0         % um
         offsetY = 0         % um
         
-        NDF = 4              % Filter NDF value
+        NDF = 3              % Filter NDF value
         frameRate = 60;     % Hz
         patternRate = 60;   % Hz
-        blueLED = 200        % 0-255
+        blueLED = 100        % 0-255
         greenLED = 0        % 0-255
     end
     

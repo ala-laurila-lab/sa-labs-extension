@@ -7,19 +7,19 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
         chan1Hold = 0
         
         chan2 = 'None';
-        chan2Mode = 'Cell attached'
+        chan2Mode = 'Off'
         chan2Hold = 0
         
         chan3  = 'None';
-        chan3Mode = 'Cell attached'
+        chan3Mode = 'Off'
         chan3Hold = 0
         
         chan4  = 'None';
-        chan4Mode = 'Cell attached'
+        chan4Mode = 'Off'
         chan4Hold = 0
         
         spikeDetectorMode = 'Filtered Threshold';
-        spikeThreshold = 15 % pA or std
+        spikeThreshold = 20 % pA or std
     end
     
     properties (Transient, Hidden)
@@ -43,7 +43,7 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
         chan3ModeType = symphonyui.core.PropertyType('char', 'row', {'Cell attached','Whole cell','Off'});
         chan4ModeType = symphonyui.core.PropertyType('char', 'row', {'Cell attached','Whole cell','Off'});
         
-        spikeDetectorModeType = symphonyui.core.PropertyType('char', 'row', {'Simple Threshold', 'Filtered Threshold'});
+        spikeDetectorModeType = symphonyui.core.PropertyType('char', 'row', {'Simple Threshold', 'Filtered Threshold', 'none'});
     end
     
     methods
@@ -106,7 +106,7 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
                     device.applyBackground();
                     
                     if prevBackground ~= newBackground
-                        pause(3);
+                        pause(5);
                     end
                 end
             end
@@ -115,22 +115,27 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
             devices = {};
             for ci = 1:4
                 ampName = obj.(['chan' num2str(ci)]);
-                if ~strcmp(ampName, 'None');
+                ampMode = obj.(['chan' num2str(ci) 'Mode']);
+                if ~(strcmp(ampName, 'None') || strcmp(ampMode, 'Off'));
                     device = obj.rig.getDevice(ampName);
                     devices{end+1} = device; %#ok<AGROW>
                 end
             end
             
-            if obj.responsePlotMode ~= false
-                obj.responseFigure = obj.showFigure('sa_labs.figures.ResponseAnalysisFigure', devices, ...
-                    'activeFunctionNames', {'mean'}, ...
-                    'totalNumEpochs',obj.totalNumEpochs,...
-                    'epochSplitParameter',obj.responsePlotSplitParameter,...
-                    'plotMode',obj.responsePlotMode,... 
-                    'analysisRegion', 1e-3 * [obj.preTime, obj.preTime + obj.stimTime + 0.5],...
-                    'responseMode',obj.chan1Mode,... % TODO: different modes for multiple amps
-                    'spikeThreshold', obj.spikeThreshold, ...
-                    'spikeDetectorMode', obj.spikeDetectorMode);
+            for i = 1 : numel(devices)
+                if obj.responsePlotMode ~= false
+                    class = strcat('sa_labs.figures.ResponseAnalysisFigure', num2str(i));
+                    chanModeStr = strcat('chan', num2str(ci), 'Mode');
+                    obj.responseFigure = obj.showFigure(class, devices(i), ...
+                        'activeFunctionNames', {'mean'}, ...
+                        'totalNumEpochs',obj.totalNumEpochs,...
+                        'epochSplitParameter',obj.responsePlotSplitParameter,...
+                        'plotMode',obj.responsePlotMode,...
+                        'analysisRegion', 1e-3 * [obj.preTime, obj.preTime + obj.stimTime + 0.5],...
+                        'responseMode',obj.(chanModeStr),... % TODO: different modes for multiple amps
+                        'spikeThreshold', obj.spikeThreshold, ...
+                        'spikeDetectorMode', obj.spikeDetectorMode);
+                end
             end
             
         end
@@ -140,8 +145,9 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
             
             for ci = 1:4
                 ampName = obj.(['chan' num2str(ci)]);
+                ampMode = obj.(['chan' num2str(ci) 'Mode']);
                 
-                if strcmp(ampName, 'None')
+                if strcmp(ampName, 'None') || strcmp(ampMode, 'Off')
                    continue
                 end
                 ampDevice = obj.rig.getDevice(ampName);

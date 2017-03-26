@@ -33,7 +33,7 @@ classdef AaltoPatchRig < symphonyui.core.descriptions.RigDescription
             daq.getStream('doport0').setBitPosition(trigger, 0);
             obj.addDevice(trigger);
               
-            lightCrafter = sa_labs.devices.LightCrafterDevice('micronsPerPixel',  0.6);
+            lightCrafter = sa_labs.devices.LightCrafterDevice('micronsPerPixel',  1.869);
             lightCrafter.setConfigurationSetting('frameTrackerPosition', [40, 40]);
             lightCrafter.setConfigurationSetting('frameTrackerSize', [80, 80])
             obj.addDevice(lightCrafter);
