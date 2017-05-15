@@ -22,8 +22,8 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         color = 'blue';
         bitDepth = 8;
         numPatternsPerFrame = 1
-        offsetXCorrection = -45
-        offsetYCorrection = -10
+        offsetXCorrection = 0
+        offsetYCorrection = 0
         colorType = symphonyui.core.PropertyType('char', 'row', {'cyan','blue','green'});
     end
        

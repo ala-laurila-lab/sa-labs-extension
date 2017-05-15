@@ -57,9 +57,6 @@ classdef WhiteNoiseFlicker < sa_labs.protocols.StageProtocol
             obj.waveVec = randn(1, nFrames);
             obj.waveVec = obj.waveVec .* obj.noiseSD; % set SD
             obj.waveVec = obj.waveVec + obj.meanLevel; % add mean
-            obj.waveVec(obj.waveVec > 1) = 1; % clip out of bounds values
-            obj.waveVec(obj.waveVec > obj.meanLevel * 2) = obj.meanLevel * 2; % clip out of bounds values
-            obj.waveVec(obj.waveVec < 0) = 0;
         end
         
         function p = createPresentation(obj)

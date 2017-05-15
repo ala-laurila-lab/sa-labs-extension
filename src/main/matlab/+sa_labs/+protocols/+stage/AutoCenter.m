@@ -24,6 +24,7 @@ classdef AutoCenter < sa_labs.protocols.StageProtocol
         valueMax = 1.0;
         numValues = 1;
         numValueRepeats = 1;
+        responsePlotMode = 'false';
     end
     
     properties (Hidden)
@@ -40,8 +41,7 @@ classdef AutoCenter < sa_labs.protocols.StageProtocol
         currentVoltageIndex
         runConfig
         pointSetIndex
-        
-        responsePlotMode = 'cartesian';
+        responsePlotModeType = symphonyui.core.PropertyType('char', 'row', {'false', 'cartesian'});
         responsePlotSplitParameter = 'presentationId';
         
     end
@@ -90,12 +90,14 @@ classdef AutoCenter < sa_labs.protocols.StageProtocol
             warning('off','MATLAB:structOnObject')
             propertyStruct = struct(obj);
             
+            
             obj.shapeResponseFigure = obj.showFigure('sa_labs.figures.ShapeResponseFigure', devices, ...
                 propertyStruct,...
                 'shapePlotMode','plotSpatial_mean',...
                 'responseMode',obj.chan1Mode,... % TODO: different modes for multiple amps
                 'spikeThreshold', obj.spikeThreshold, ...
                 'spikeDetectorMode', obj.spikeDetectorMode);
+            
             
             prepareRun@sa_labs.protocols.StageProtocol(obj);
         end

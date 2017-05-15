@@ -6,10 +6,10 @@ classdef LightStep < sa_labs.protocols.StageProtocol
         stimTime = 1000	% Spot duration (ms)
         tailTime = 1000	% Spot trailing duration (ms)
         
-        intensity = 0.5;
+        intensity = 1;
         
         spotSize = 200; % um
-        numberOfEpochs = 500;
+        numberOfEpochs = 40;
     end
     
     properties (Hidden)
