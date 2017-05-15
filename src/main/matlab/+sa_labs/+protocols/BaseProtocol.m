@@ -123,7 +123,7 @@ classdef (Abstract) BaseProtocol < symphonyui.core.Protocol
             end
             
             if islogical(obj.responsePlotMode)
-                plotEnabled = ~ obj.responsePlotMode;
+                plotEnabled = obj.responsePlotMode;
             else
                 plotEnabled = ~ strcmpi(obj.responsePlotMode, 'false');
             end
