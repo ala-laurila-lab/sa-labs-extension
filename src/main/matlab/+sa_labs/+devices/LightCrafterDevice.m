@@ -1,6 +1,6 @@
 classdef LightCrafterDevice < symphonyui.core.Device
     
-    properties (Access = private, Transient)
+    properties (Access = protected, Transient)
         stageClient
         lightCrafter
         patternRatesToAttributes
@@ -50,6 +50,8 @@ classdef LightCrafterDevice < symphonyui.core.Device
             obj.addConfigurationSetting('lightCrafterPatternRate', obj.lightCrafter.currentPatternRate(), 'isReadOnly', true);
             obj.addConfigurationSetting('micronsPerPixel', ip.Results.micronsPerPixel, 'isReadOnly', true);
             obj.addConfigurationSetting('canvasTranslation', [0,0]);
+            obj.addConfigurationSetting('backgroundSize', canvasSize);  
+            obj.addConfigurationSetting('backgroundIntensity', 0); % also pattern 1 if contrast mode
         end
         
         function close(obj)
@@ -101,6 +103,25 @@ classdef LightCrafterDevice < symphonyui.core.Device
             obj.lightCrafter.setLedCurrents(r, g, b)
         end
         
+        function background = getBackground(obj)
+            backGroundSize = obj.getConfigurationSetting('backgroundSize');
+            canvasSize = obj.getCanvasSize();
+            canvasTranslation = obj.getConfigurationSetting('canvasTranslation');
+            background = stage.builtin.stimuli.Rectangle();
+            background.size = backGroundSize;
+            background.position = canvasSize/2 - canvasTranslation;
+            background.opacity = 1;
+        end
+
+        function backGroundSize = getBackgroundSizeInMicrons(obj)
+            micronsPerPixel = obj.getConfigurationSetting('micronsPerPixel');
+            backGroundSize = obj.getConfigurationSetting('backgroundSize') * micronsPerPixel;
+        end
+
+        function setBackgroundSizeInMicrons(obj, backGroundSize)
+            obj.setConfigurationSetting('backgroundSize', obj.um2pix(backGroundSize));
+        end
+
         function play(obj, presentation)
             canvasSize = obj.getCanvasSize();
             canvasTranslation = obj.getConfigurationSetting('canvasTranslation');
@@ -108,11 +129,8 @@ classdef LightCrafterDevice < symphonyui.core.Device
             obj.stageClient.setCanvasProjectionOrthographic(0, canvasSize(1), 0, canvasSize(2));            
             obj.stageClient.setCanvasProjectionTranslate(canvasTranslation(1), canvasTranslation(2), 0);
 
-            background = stage.builtin.stimuli.Rectangle();
-            background.size = canvasSize;
-            background.position = canvasSize/2 - canvasTranslation;
-            background.color = presentation.backgroundColor;
-            presentation.setBackgroundColor(0);
+            background = obj.getBackground();
+            intensity1 = obj.getConfigurationSetting('backgroundIntensity');
             presentation.insertStimulus(1, background);
             
             tracker = stage.builtin.stimuli.Rectangle();

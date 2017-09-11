@@ -11,6 +11,7 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
         patternRate = 60;   % Hz
         blueLED = 100        % 0-255
         greenLED = 0        % 0-255
+        backgroundSize      % In micrometers
     end
     
     properties (Dependent)
@@ -40,8 +41,17 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
                 case {'meanLevel', 'intensity'}
                     d.category = '1 Basic';
                     
-                case {'color','offsetX','offsetY','blueLED','greenLED','patternsPerFrame','NDF','frameRate','patternRate','bitDepth','RstarMean','RstarIntensity'}
+                case {'color','offsetX','offsetY','blueLED','greenLED','patternsPerFrame','NDF','frameRate','patternRate','bitDepth','RstarMean','RstarIntensity', 'backgroundSize'}
                     d.category = '8 Projector';
+            end
+        end
+
+        function didSetRig(obj)
+            didSetRig@sa_labs.protocols.BaseProtocol(obj);
+            
+            if ~isempty(obj.rig.getDevices('LightCrafter'))
+                lcr = obj.rig.getDevice('LightCrafter');
+                obj.backgroundSize = lcr.getBackgroundSizeInMicrons(); % in micron
             end
         end
         
@@ -78,6 +88,8 @@ classdef (Abstract) StageProtocol < sa_labs.protocols.BaseProtocol
                 offsetXValue = obj.offsetXCorrection + obj.offsetX;
                 offsetYValue = obj.offsetYCorrection + obj.offsetY;
                 lightCrafter.setConfigurationSetting('canvasTranslation', [obj.um2pix(offsetXValue), obj.um2pix(offsetYValue)]);
+                lightCrafter.setBackgroundSizeInMicrons(obj.backgroundSize);
+                lightCrafter.setConfigurationSetting('backgroundIntensity', obj.meanLevel)
                 pause(0.2); % let the projector get set up
             end
             prepareRun@sa_labs.protocols.BaseProtocol(obj);
