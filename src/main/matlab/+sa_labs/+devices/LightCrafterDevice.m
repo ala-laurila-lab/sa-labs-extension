@@ -162,7 +162,29 @@ classdef LightCrafterDevice < symphonyui.core.Device
         end
         
         function setPatternAttributes(obj, bitDepth, color, numPatterns)
-            obj.lightCrafter.setPatternAttributes(bitDepth, color, numPatterns)
+            setState = false;
+            attempt = 0;
+            while ~ setState
+                try
+                    obj.lightCrafter.setPatternAttributes(bitDepth, color, numPatterns)
+                    setState = true;
+                catch exception
+                    if attempt > 2
+                        rethrow(exception);
+                    end
+                    warning(exception.message);
+                    attempt = attempt + 1;
+                    disp('retrying in 0.1 second');
+                    obj.reconnectLightCrafter();
+                end
+            end
+        end
+        
+        function reconnectLightCrafter(obj)
+            obj.lightCrafter.disconnect();
+            pause(0.1);
+            obj.lightCrafter.connect();
+            obj.lightCrafter.setMode('pattern');
         end
                 
         function r = getPatternRate(obj)
